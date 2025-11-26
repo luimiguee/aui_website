@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Email - AUI Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/design-system.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--gradient-primary);
+        }
+        .verify-container {
+            max-width: 500px;
+            width: 90%;
+            background: var(--white);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-12);
+            text-align: center;
+            box-shadow: var(--shadow-2xl);
+            animation: scaleIn var(--transition-base);
+        }
+        .verify-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto var(--space-6);
+            background: var(--gradient-primary);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-5xl);
+            color: var(--white);
+        }
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <div class="verify-icon" id="icon">
+            <i class="fas fa-spinner loading"></i>
+        </div>
+        <h2 id="title">A verificar...</h2>
+        <p id="message" style="color: var(--gray-600); margin-bottom: var(--space-6);">
+            Por favor aguarde enquanto verificamos o seu email.
+        </p>
+        <div id="actions"></div>
+    </div>
+
+    <script>
+        async function verifyEmail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            if (!token) {
+                showError('Token inválido');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:3000/api/auth/verify-email/${token}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess();
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                showError('Erro ao verificar email. Tente novamente.');
+            }
+        }
+        
+        function showSuccess() {
+            document.getElementById('icon').innerHTML = '<i class="fas fa-check"></i>';
+            document.getElementById('title').textContent = 'Email Verificado!';
+            document.getElementById('message').textContent = 'O seu email foi verificado com sucesso. Já pode fazer login.';
+            document.getElementById('actions').innerHTML = '<a href="login.html" class="btn btn-primary btn-lg"><i class="fas fa-sign-in-alt"></i> Ir para Login</a>';
+        }
+        
+        function showError(msg) {
+            document.getElementById('icon').innerHTML = '<i class="fas fa-times"></i>';
+            document.getElementById('icon').style.background = 'var(--error)';
+            document.getElementById('title').textContent = 'Erro na Verificação';
+            document.getElementById('message').textContent = msg;
+            document.getElementById('actions').innerHTML = '<a href="register.html" class="btn btn-primary btn-lg">Voltar ao Registo</a>';
+        }
+        
+        // Verificar automaticamente ao carregar
+        verifyEmail();
+    </script>
+</body>
+</html>
+

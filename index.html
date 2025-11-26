@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUI Store - Loja Online Premium</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <!-- Navbar -->
+        <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                    <i class="fas fa-store"></i>
+                    <span>AUI Store</span>
+                </div>
+                
+                <div class="navbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
+                </div>
+                
+                <div class="navbar-actions">
+                    <button class="navbar-icon-btn" id="favoritesBtn" title="Favoritos">
+                        <i class="fas fa-heart"></i>
+                        <span class="badge-count" id="favoritesCount">0</span>
+                    </button>
+                    
+                    <button class="navbar-icon-btn" id="cartBtn" title="Carrinho">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge-count" id="cartCount">0</span>
+                    </button>
+                    
+                    <div class="navbar-user" id="userMenu">
+                        <button class="navbar-icon-btn" id="userBtn">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown">
+                            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                            <a href="login.html"><i class="fas fa-sign-in-alt"></i> Entrar</a>
+                            <a href="register.html"><i class="fas fa-user-plus"></i> Registar</a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </nav>
+
+    <!-- Hero Section -->
+        <section class="hero">
+        <div class="container">
+            <div class="hero-content animate-slideUp">
+                <h1>Bem-vindo à AUI Store</h1>
+                <p class="hero-subtitle">Descubra produtos incríveis com os melhores preços</p>
+                <div class="hero-buttons">
+                    <a href="#products" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag"></i> Ver Produtos
+                    </a>
+                    <a href="register.html" class="btn btn-outline btn-lg">
+                        <i class="fas fa-user-plus"></i> Criar Conta
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Categorias</h2>
+                <p>Explore por categoria</p>
+            </div>
+            
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="category-card" data-category="all">
+                    <div class="category-icon">
+                        <i class="fas fa-th"></i>
+                    </div>
+                    <h3>Todos</h3>
+                </div>
+                <!-- Categorias dinâmicas serão adicionadas aqui -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section" id="products">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h2>Nossos Produtos</h2>
+                    <p>Produtos de qualidade premium</p>
+                </div>
+                <div class="products-filters">
+                    <select id="sortSelect" class="filter-select">
+                        <option value="newest">Mais Recentes</option>
+                        <option value="price-asc">Preço: Menor para Maior</option>
+                        <option value="price-desc">Preço: Maior para Menor</option>
+                        <option value="name">Nome A-Z</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="products-grid" id="productsGrid">
+                <!-- Loading -->
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>A carregar produtos...</p>
+                </div>
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-box-open"></i>
+                <h3>Nenhum produto encontrado</h3>
+                <p>Tente ajustar os filtros ou pesquisar por algo diferente</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Entre em Contacto</h2>
+                    <p class="contact-subtitle">Tem alguma questão? Estamos aqui para ajudar!</p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4>Email</h4>
+                                <p>contacto@auistore.pt</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h4>Telefone</h4>
+                                <p>+351 123 456 789</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4>Morada</h4>
+                                <p>Rua Exemplo, 123<br>1000-000 Lisboa</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-method-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4>Horário</h4>
+                                <p>Seg-Sex: 9h-18h<br>Sáb: 10h-14h</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contactForm">
+                        <h3>Envie-nos uma Mensagem</h3>
+                        
+                        <div class="form-group">
+                            <label for="contactName">Nome *</label>
+                            <input type="text" id="contactName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactEmail">Email *</label>
+                            <input type="email" id="contactEmail" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactPhone">Telefone</label>
+                            <input type="tel" id="contactPhone" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactSubject">Assunto *</label>
+                            <select id="contactSubject" class="form-input" required>
+                                <option value="">Selecione um assunto</option>
+                                <option value="info">Informações</option>
+                                <option value="support">Suporte Técnico</option>
+                                <option value="order">Questão sobre Pedido</option>
+                                <option value="product">Informação sobre Produto</option>
+                                <option value="other">Outro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contactMessage">Mensagem *</label>
+                            <textarea id="contactMessage" class="form-input" rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg btn-full">
+                            <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                        </button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+            <div class="container">
+                <div class="features-grid">
+                    <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Envio Rápido</h3>
+                    <p>Entrega em 24-48h para Portugal Continental</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Pagamento Seguro</h3>
+                    <p>Transações 100% seguras e encriptadas</p>
+                </div>
+                
+                    <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <h3>Devolução Grátis</h3>
+                    <p>30 dias para devolver o seu produto</p>
+                </div>
+                
+                    <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Suporte 24/7</h3>
+                    <p>Equipa disponível para ajudar sempre que precisar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-store"></i> AUI Store</h4>
+                    <p>A sua loja online de confiança com os melhores produtos e preços.</p>
+                    <div class="footer-socials">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="#products">Produtos</a></li>
+                        <li><a href="login.html">Login</a></li>
+                        <li><a href="register.html">Registar</a></li>
+                        <li><a href="admin.html">Admin</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Suporte</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Envios</a></li>
+                        <li><a href="#">Devoluções</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Newsletter</h4>
+                    <p>Receba as melhores ofertas</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="O seu email">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 AUI Store. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-cart"></i> Carrinho</h3>
+            <button class="cart-close" id="closeCart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">
+                <i class="fas fa-shopping-cart"></i>
+                <p>O seu carrinho está vazio</p>
+                <a href="#products" class="btn btn-primary btn-sm">Ver Produtos</a>
+            </div>
+        </div>
+        
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span class="total-price" id="totalPrice">0,00€</span>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="checkout()">
+                <i class="fas fa-credit-card"></i> Finalizar Compra
+            </button>
+        </div>
+    </div>
+
+    <div class="cart-backdrop" id="cartBackdrop"></div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-lg">
+            <button class="modal-close" onclick="closeProductModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-body" id="productModalContent">
+                <!-- Conteúdo do produto será carregado aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
