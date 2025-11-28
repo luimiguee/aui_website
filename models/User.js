@@ -43,6 +43,16 @@ const userSchema = new mongoose.Schema({
   verificationTokenExpires: {
     type: Date
   },
+  addresses: [{
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    postalCode: { type: String, required: true },
+    country: { type: String, default: 'PT' },
+    isDefault: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now }
+  }],
   createdAt: {
     type: Date,
     default: Date.now

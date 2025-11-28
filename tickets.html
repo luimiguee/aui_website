@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suporte - AUI Store</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/theme-modern.css">
+    <link rel="stylesheet" href="css/tickets.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar animate-slideDown">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="index.html" class="navbar-brand">
+                    <i class="fas fa-store"></i>
+                    <span>AUI Store</span>
+                </a>
+                
+                <div class="navbar-actions">
+                    <a href="dashboard.html" class="btn-modern btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header animate-fadeIn">
+            <div>
+                <h1><i class="fas fa-headset"></i> Centro de Suporte</h1>
+                <p>Como podemos ajudá-lo hoje?</p>
+            </div>
+            <button class="btn-modern btn-primary" onclick="showNewTicketModal()">
+                <i class="fas fa-plus"></i> Novo Ticket
+            </button>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid animate-slideUp">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--gradient-primary);">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="totalTickets">0</h3>
+                    <p>Total de Tickets</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--gradient-accent);">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="openTickets">0</h3>
+                    <p>Tickets Abertos</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--gradient-success);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="resolvedTickets">0</h3>
+                    <p>Tickets Resolvidos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters animate-slideUp delay-200">
+            <button class="filter-btn active" data-filter="all">
+                Todos
+            </button>
+            <button class="filter-btn" data-filter="open">
+                <span class="status-dot status-open"></span> Abertos
+            </button>
+            <button class="filter-btn" data-filter="in_progress">
+                <span class="status-dot status-progress"></span> Em Progresso
+            </button>
+            <button class="filter-btn" data-filter="waiting_response">
+                <span class="status-dot status-waiting"></span> Aguardando
+            </button>
+            <button class="filter-btn" data-filter="resolved">
+                <span class="status-dot status-resolved"></span> Resolvidos
+            </button>
+            <button class="filter-btn" data-filter="closed">
+                <span class="status-dot status-closed"></span> Fechados
+            </button>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="tickets-container animate-slideUp delay-300">
+            <div id="ticketsList">
+                <div class="loading">
+                    <i class="fas fa-circle-notch animate-spin"></i>
+                    <p>A carregar tickets...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: New Ticket -->
+    <div class="modal" id="newTicketModal">
+        <div class="modal-backdrop" onclick="closeNewTicketModal()"></div>
+        <div class="modal-content animate-scaleIn">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Criar Novo Ticket</h2>
+                <button class="modal-close" onclick="closeNewTicketModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="ticket-form" id="newTicketForm">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-folder"></i> Categoria *
+                    </label>
+                    <select class="form-input" id="ticketCategory" required>
+                        <option value="">Selecione uma categoria...</option>
+                        <option value="technical">🔧 Problemas Técnicos</option>
+                        <option value="billing">💰 Faturação</option>
+                        <option value="orders">📦 Pedidos</option>
+                        <option value="account">👤 Conta</option>
+                        <option value="products">🛍️ Produtos</option>
+                        <option value="shipping">🚚 Envios</option>
+                        <option value="returns">↩️ Devoluções</option>
+                        <option value="other">📝 Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-exclamation-circle"></i> Prioridade
+                    </label>
+                    <div class="priority-selector">
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="low" checked>
+                            <span class="priority-badge badge-low">
+                                <i class="fas fa-arrow-down"></i> Baixa
+                            </span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="medium">
+                            <span class="priority-badge badge-medium">
+                                <i class="fas fa-minus"></i> Média
+                            </span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="high">
+                            <span class="priority-badge badge-high">
+                                <i class="fas fa-arrow-up"></i> Alta
+                            </span>
+                        </label>
+                        <label class="priority-option">
+                            <input type="radio" name="priority" value="urgent">
+                            <span class="priority-badge badge-urgent">
+                                <i class="fas fa-fire"></i> Urgente
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-heading"></i> Assunto *
+                    </label>
+                    <input type="text" class="form-input" id="ticketSubject" 
+                           placeholder="Descreva brevemente o problema..." maxlength="200" required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-align-left"></i> Descrição *
+                    </label>
+                    <textarea class="form-input" id="ticketDescription" rows="6"
+                              placeholder="Descreva o problema com detalhe..." required></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-modern btn-primary">
+                        <i class="fas fa-paper-plane"></i> Criar Ticket
+                    </button>
+                    <button type="button" class="btn-modern btn-secondary" onclick="closeNewTicketModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Ticket Details -->
+    <div class="modal" id="ticketDetailsModal">
+        <div class="modal-backdrop" onclick="closeTicketDetailsModal()"></div>
+        <div class="modal-content modal-lg animate-scaleIn">
+            <div class="modal-header">
+                <h2><i class="fas fa-ticket-alt"></i> Detalhes do Ticket</h2>
+                <button class="modal-close" onclick="closeTicketDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body" id="ticketDetailsContent">
+                <!-- Content aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/tickets.js"></script>
+</body>
+</html>
+
+
+
+
+

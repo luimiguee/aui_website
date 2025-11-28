@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Menu Lateral de Produtos | AUI Store</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/sidebar-shop.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .demo-header h1 {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .demo-header p {
+            font-size: 18px;
+            color: #6b7280;
+        }
+
+        .demo-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .demo-hero h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .demo-hero p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .product-content {
+            padding: 20px;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .product-add-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .product-add-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .no-products {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6b7280;
+        }
+
+        .no-products i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-products h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1>🛍️ Menu Lateral de Produtos</h1>
+            <p>Clique no botão <i class="fas fa-filter"></i> no canto superior esquerdo para filtrar produtos!</p>
+        </div>
+
+        <!-- Hero -->
+        <div class="demo-hero">
+            <h2>Navegue por Categorias</h2>
+            <p>Filtre por categoria, preço, marca e pesquise produtos facilmente</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid">
+            <!-- Os produtos serão carregados aqui -->
+        </div>
+
+        <!-- No Products -->
+        <div class="no-products" id="noProducts" style="display: none;">
+            <i class="fas fa-box-open"></i>
+            <h3>Nenhum produto encontrado</h3>
+            <p>Tente ajustar os filtros</p>
+        </div>
+    </div>
+
+    <!-- Shop Sidebar JavaScript -->
+    <script src="js/sidebar-shop.js"></script>
+
+    <script>
+        let allProducts = [];
+
+        // Carregar produtos
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/admin/products');
+                const data = await response.json();
+                allProducts = data.products || [];
+                displayProducts(allProducts);
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                allProducts = getMockProducts();
+                displayProducts(allProducts);
+            }
+        }
+
+        // Produtos mock se API falhar
+        function getMockProducts() {
+            return [
+                {
+                    _id: '1',
+                    name: 'MacBook Pro 14"',
+                    description: 'Potente laptop com chip M3 Pro',
+                    price: 2299.99,
+                    category: 'Computadores',
+                    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400'
+                },
+                {
+                    _id: '2',
+                    name: 'iPhone 15 Pro',
+                    description: 'Smartphone topo de gama com câmara de 48MP',
+                    price: 1399.99,
+                    category: 'Smartphones',
+                    image: 'https://images.unsplash.com/photo-1592286927505-ab546c326f56?w=400'
+                },
+                {
+                    _id: '3',
+                    name: 'iPad Air',
+                    description: 'Tablet versátil com chip M1',
+                    price: 699.99,
+                    category: 'Tablets',
+                    image: 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=400'
+                }
+            ];
+        }
+
+        // Exibir produtos
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            const noProducts = document.getElementById('noProducts');
+
+            if (products.length === 0) {
+                grid.style.display = 'none';
+                noProducts.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            noProducts.style.display = 'none';
+
+            grid.innerHTML = products.map(product => `
+                <div class="product-card" data-category="${product.category}">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-content">
+                        <div class="product-category">${product.category}</div>
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-description">${product.description.substring(0, 80)}...</p>
+                        <div class="product-footer">
+                            <div class="product-price">${product.price.toFixed(2)}€</div>
+                            <button class="product-add-btn">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtrar produtos
+        function filterProducts(filters) {
+            console.log('Filtrando com:', filters);
+
+            let filtered = [...allProducts];
+
+            // Filtro de categoria
+            if (filters.category && filters.category !== 'all') {
+                filtered = filtered.filter(p => p.category === filters.category);
+            }
+
+            // Filtro de preço
+            if (filters.priceMin) {
+                filtered = filtered.filter(p => p.price >= parseFloat(filters.priceMin));
+            }
+            if (filters.priceMax) {
+                filtered = filtered.filter(p => p.price <= parseFloat(filters.priceMax));
+            }
+
+            // Filtro de pesquisa
+            if (filters.search) {
+                const search = filters.search.toLowerCase();
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(search) ||
+                    p.description.toLowerCase().includes(search)
+                );
+            }
+
+            displayProducts(filtered);
+        }
+
+        // Escutar mudanças de filtro
+        window.addEventListener('shopFiltersChanged', (e) => {
+            filterProducts(e.detail);
+        });
+
+        // Carregar produtos ao iniciar
+        loadProducts();
+    </script>
+</body>
+</html>
+
+

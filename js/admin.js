@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadUsers();
     await loadProducts();
     await loadOrders();
+    await loadLogsStats();
 
     // Configurar navegação
     setupNavigation();
@@ -47,35 +48,147 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Configurar navegação entre secções
 function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
+    const navItems = document.querySelectorAll('.nav-item[data-section]');
     
-    navItems.forEach(item => {
+    navItems.forEach((item, index) => {
+        // Adicionar animação inicial com delay
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-20px)';
+        setTimeout(() => {
+            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, index * 100);
+        
         item.addEventListener('click', function(e) {
             e.preventDefault();
             const section = this.dataset.section;
             
-            // Atualizar navegação ativa
-            navItems.forEach(nav => nav.classList.remove('active'));
+            // Não fazer nada se já está ativo
+            if (this.classList.contains('active')) return;
+            
+            // Atualizar navegação ativa com animação
+            navItems.forEach(nav => {
+                nav.classList.remove('active');
+                nav.style.transform = 'translateX(0)';
+            });
             this.classList.add('active');
             
-            // Mostrar secção correspondente
-            document.querySelectorAll('.content-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
-            document.getElementById(`section-${section}`).classList.add('active');
+            // Animação de saída da secção atual
+            const currentSection = document.querySelector('.content-section.active');
+            if (currentSection) {
+                currentSection.style.animation = 'fadeOutLeft 0.3s ease';
+                setTimeout(() => {
+                    currentSection.classList.remove('active');
+                    currentSection.style.animation = '';
+                }, 300);
+            }
             
-            // Atualizar título
+            // Mostrar nova secção com animação
+            setTimeout(() => {
+                const newSection = document.getElementById(`section-${section}`);
+                newSection.classList.add('active');
+                newSection.style.animation = 'fadeInRight 0.4s ease';
+            }, 300);
+            
+            // Carregar dados específicos da seção
+            if (section === 'tickets') {
+                loadTickets();
+            } else if (section === 'logs') {
+                loadLogs();
+            }
+
+            // Atualizar título com animação
             const titles = {
                 'dashboard': 'Dashboard',
                 'users': 'Gestão de Utilizadores',
                 'products': 'Gestão de Produtos',
                 'orders': 'Gestão de Pedidos',
-                'settings': 'Definições'
+                'tickets': 'Tickets de Suporte',
+                'settings': 'Definições',
+                'logs': 'Logs do Sistema'
             };
-            document.getElementById('pageTitle').textContent = titles[section];
+            const titleElement = document.getElementById('pageTitle');
+            titleElement.style.animation = 'fadeOut 0.2s ease';
+            setTimeout(() => {
+                titleElement.textContent = titles[section];
+                titleElement.style.animation = 'fadeIn 0.3s ease';
+            }, 200);
+        });
+        
+        // Efeito de ripple ao clicar
+        item.addEventListener('mousedown', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                background: rgba(99, 102, 241, 0.5);
+                left: ${x}px;
+                top: ${y}px;
+                pointer-events: none;
+                animation: rippleEffect 0.6s ease-out;
+            `;
+            
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
         });
     });
 }
+
+// Adicionar CSS das animações dinamicamente
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeOutLeft {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    
+    @keyframes rippleEffect {
+        from {
+            transform: scale(0);
+            opacity: 1;
+        }
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
 
 // Configurar formulários
 function setupForms() {
@@ -749,6 +862,350 @@ function exportData() {
         URL.revokeObjectURL(url);
 
         showMessage('Dados exportados com sucesso', 'success');
+    }
+}
+
+// ================ LOGS DO SISTEMA ================
+
+async function loadLogs(page = 1) {
+    const level = document.getElementById('logLevelFilter').value;
+    const type = document.getElementById('logTypeFilter').value;
+    
+    try {
+        let url = `/logs?page=${page}&limit=50`;
+        if (level) url += `&level=${level}`;
+        if (type) url += `&type=${type}`;
+        
+        const response = await fetchAPI(url);
+        
+        if (response.success) {
+            renderLogsTable(response.logs);
+            renderLogsPagination(response.pagination);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar logs:', error);
+    }
+}
+
+async function loadLogsStats() {
+    try {
+        const response = await fetchAPI('/logs/stats');
+        if (response.success) {
+            document.getElementById('totalLogs').textContent = response.stats.total;
+            const errors = response.stats.byLevel.find(l => l._id === 'error');
+            document.getElementById('errorLogs').textContent = errors ? errors.count : 0;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas dos logs:', error);
+    }
+}
+
+function renderLogsTable(logs) {
+    const tbody = document.getElementById('logsTableBody');
+    
+    if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum log encontrado</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = logs.map(log => `
+        <tr>
+            <td>${new Date(log.timestamp).toLocaleString('pt-PT')}</td>
+            <td><span class="badge badge-${getLogLevelBadge(log.level)}">${log.level}</span></td>
+            <td>${log.type}</td>
+            <td><small>${log.action}</small></td>
+            <td>${log.message}</td>
+            <td>${log.userName || 'Sistema'}</td>
+            <td>
+                <button class="btn-icon" onclick="viewLogDetails('${log._id}')" title="Ver Detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderLogsPagination(pagination) {
+    const container = document.getElementById('logsPagination');
+    if (!pagination || pagination.pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="pagination-buttons">';
+    for (let i = 1; i <= Math.min(pagination.pages, 10); i++) {
+        html += `<button class="btn ${i === pagination.page ? 'btn-primary' : 'btn-secondary'}" 
+                         onclick="loadLogs(${i})">${i}</button>`;
+    }
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function getLogLevelBadge(level) {
+    const badges = {
+        'info': 'info',
+        'success': 'success',
+        'warn': 'warning',
+        'error': 'danger',
+        'debug': 'secondary'
+    };
+    return badges[level] || 'secondary';
+}
+
+async function viewLogDetails(logId) {
+    try {
+        const response = await fetchAPI(`/logs/${logId}`);
+        if (response.success) {
+            const log = response.log;
+            alert(`Log Completo:\n\n${JSON.stringify(log, null, 2)}`);
+        }
+    } catch (error) {
+        showMessage('Erro ao carregar detalhes do log', 'error');
+    }
+}
+
+async function exportLogs() {
+    const level = document.getElementById('logLevelFilter').value;
+    const type = document.getElementById('logTypeFilter').value;
+    
+    let url = '/api/logs/export/csv?';
+    if (level) url += `level=${level}&`;
+    if (type) url += `type=${type}&`;
+    
+    window.open(url, '_blank');
+    showMessage('A exportar logs...', 'info');
+}
+
+// ==================== TICKETS FUNCTIONS ====================
+
+let allTickets = [];
+
+async function loadTickets() {
+    try {
+        const token = localStorage.getItem('token');
+        
+        // Load stats
+        const statsResponse = await fetch(`${API_URL}/tickets/admin/stats`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            document.getElementById('adminTotalTickets').textContent = stats.total || 0;
+            document.getElementById('adminOpenTickets').textContent = stats.open || 0;
+            document.getElementById('adminProgressTickets').textContent = stats.in_progress || 0;
+            document.getElementById('adminUrgentTickets').textContent = stats.urgent || 0;
+        }
+
+        // Load tickets
+        const response = await fetch(`${API_URL}/tickets/admin/all`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Erro ao carregar tickets');
+
+        allTickets = await response.json();
+        displayTickets(allTickets);
+
+    } catch (error) {
+        console.error('Error loading tickets:', error);
+        showMessage('Erro ao carregar tickets', 'error');
+    }
+}
+
+function displayTickets(tickets) {
+    const tbody = document.getElementById('ticketsTableBody');
+    
+    if (tickets.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">Nenhum ticket encontrado</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = tickets.map(ticket => `
+        <tr>
+            <td><strong>${ticket.ticketNumber}</strong></td>
+            <td>${ticket.user?.name || 'N/A'}</td>
+            <td>${ticket.subject}</td>
+            <td>${getCategoryLabel(ticket.category)}</td>
+            <td>${getPriorityBadge(ticket.priority)}</td>
+            <td>${getStatusBadge(ticket.status)}</td>
+            <td>${ticket.assignedTo?.name || '-'}</td>
+            <td>${new Date(ticket.createdAt).toLocaleDateString('pt-PT')}</td>
+            <td class="actions">
+                <button class="btn-icon" title="Ver Detalhes" onclick="viewTicketAdmin('${ticket._id}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${!ticket.assignedTo ? `
+                <button class="btn-icon" title="Atribuir a Mim" onclick="assignTicketToMe('${ticket._id}')">
+                    <i class="fas fa-user-plus"></i>
+                </button>
+                ` : ''}
+                ${ticket.status !== 'resolved' ? `
+                <button class="btn-icon btn-success" title="Resolver" onclick="resolveTicket('${ticket._id}')">
+                    <i class="fas fa-check"></i>
+                </button>
+                ` : ''}
+            </td>
+        </tr>
+    `).join('');
+}
+
+function getCategoryLabel(category) {
+    const categories = {
+        technical: '🔧 Técnico',
+        billing: '💰 Faturação',
+        orders: '📦 Pedidos',
+        account: '👤 Conta',
+        products: '🛍️ Produtos',
+        shipping: '🚚 Envios',
+        returns: '↩️ Devoluções',
+        other: '📝 Outro'
+    };
+    return categories[category] || category;
+}
+
+function getPriorityBadge(priority) {
+    const badges = {
+        low: '<span class="badge badge-secondary">Baixa</span>',
+        medium: '<span class="badge badge-info">Média</span>',
+        high: '<span class="badge badge-warning">Alta</span>',
+        urgent: '<span class="badge badge-error">Urgente</span>'
+    };
+    return badges[priority] || priority;
+}
+
+function getStatusBadge(status) {
+    const badges = {
+        open: '<span class="badge badge-info">Aberto</span>',
+        in_progress: '<span class="badge badge-warning">Em Progresso</span>',
+        waiting_response: '<span class="badge" style="background:#06b6d4;color:white;">Aguardando</span>',
+        resolved: '<span class="badge badge-success">Resolvido</span>',
+        closed: '<span class="badge badge-secondary">Fechado</span>'
+    };
+    return badges[status] || status;
+}
+
+function filterTickets() {
+    const status = document.getElementById('ticketStatusFilter').value;
+    const priority = document.getElementById('ticketPriorityFilter').value;
+    const category = document.getElementById('ticketCategoryFilter').value;
+
+    let filtered = allTickets;
+
+    if (status) {
+        filtered = filtered.filter(t => t.status === status);
+    }
+    if (priority) {
+        filtered = filtered.filter(t => t.priority === priority);
+    }
+    if (category) {
+        filtered = filtered.filter(t => t.category === category);
+    }
+
+    displayTickets(filtered);
+}
+
+async function viewTicketAdmin(ticketId) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/tickets/${ticketId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Erro ao carregar ticket');
+
+        const ticket = await response.json();
+
+        let details = `
+TICKET: ${ticket.ticketNumber}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cliente: ${ticket.user?.name} (${ticket.user?.email})
+Assunto: ${ticket.subject}
+Categoria: ${getCategoryLabel(ticket.category)}
+Prioridade: ${ticket.priority}
+Estado: ${ticket.status}
+Criado: ${new Date(ticket.createdAt).toLocaleString('pt-PT')}
+Atribuído: ${ticket.assignedTo?.name || 'Não atribuído'}
+
+DESCRIÇÃO:
+${ticket.description}
+
+MENSAGENS (${ticket.messages?.length || 0}):
+`;
+
+        if (ticket.messages && ticket.messages.length > 0) {
+            ticket.messages.forEach(msg => {
+                details += `\n[${msg.senderType === 'admin' ? 'ADMIN' : 'CLIENTE'}] ${msg.sender?.name}
+${new Date(msg.createdAt).toLocaleString('pt-PT')}
+${msg.message}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            });
+        } else {
+            details += '\nSem mensagens ainda.\n';
+        }
+
+        alert(details);
+
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage('Erro ao carregar detalhes do ticket', 'error');
+    }
+}
+
+async function assignTicketToMe(ticketId) {
+    if (!confirm('Atribuir este ticket a si?')) return;
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/tickets/${ticketId}/assign`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ adminId: currentUser._id || currentUser.id })
+        });
+
+        if (!response.ok) throw new Error('Erro ao atribuir ticket');
+
+        showMessage('Ticket atribuído com sucesso!', 'success');
+        await loadTickets();
+
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage('Erro ao atribuir ticket', 'error');
+    }
+}
+
+async function resolveTicket(ticketId) {
+    if (!confirm('Marcar este ticket como resolvido?')) return;
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/tickets/${ticketId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: 'resolved' })
+        });
+
+        if (!response.ok) throw new Error('Erro ao resolver ticket');
+
+        showMessage('Ticket resolvido!', 'success');
+        await loadTickets();
+
+    } catch (error) {
+        console.error('Error:', error);
+        showMessage('Erro ao resolver ticket', 'error');
     }
 }
 

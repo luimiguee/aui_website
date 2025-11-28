@@ -17,8 +17,9 @@
             <h2><i class="fas fa-crown"></i> Admin Panel</h2>
         </div>
         <nav class="sidebar-nav">
-            <a href="index.html" class="nav-item nav-item-site" title="Voltar ao Site">
+            <a href="/index.html" class="nav-item nav-item-site" title="Voltar ao Site" onclick="event.preventDefault(); window.location.href='/index.html';">
                 <i class="fas fa-home"></i> Ver Site
+                <i class="fas fa-external-link-alt nav-item-icon-right"></i>
             </a>
             <div class="nav-divider"></div>
             <a href="#dashboard" class="nav-item active" data-section="dashboard">
@@ -33,8 +34,14 @@
             <a href="#orders" class="nav-item" data-section="orders">
                 <i class="fas fa-shopping-cart"></i> Pedidos
             </a>
+            <a href="#tickets" class="nav-item" data-section="tickets">
+                <i class="fas fa-ticket-alt"></i> Tickets de Suporte
+            </a>
             <a href="#settings" class="nav-item" data-section="settings">
                 <i class="fas fa-cog"></i> Definições
+            </a>
+            <a href="#logs" class="nav-item" data-section="logs">
+                <i class="fas fa-clipboard-list"></i> Logs do Sistema
             </a>
         </nav>
         <div class="sidebar-footer">
@@ -206,6 +213,175 @@
                     </tbody>
                 </table>
             </div>
+        </section>
+
+        <!-- Tickets Section -->
+        <section id="section-tickets" class="content-section">
+            <div class="section-actions">
+                <button class="btn btn-secondary" onclick="loadTickets()">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+
+            <div class="stats-grid" style="margin-bottom: 24px;">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="adminTotalTickets">0</h3>
+                        <p>Total de Tickets</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="adminOpenTickets">0</h3>
+                        <p>Tickets Abertos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="adminProgressTickets">0</h3>
+                        <p>Em Progresso</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="adminUrgentTickets">0</h3>
+                        <p>Urgentes</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-bar" style="margin-bottom: 24px;">
+                <select id="ticketStatusFilter" class="form-control" onchange="filterTickets()">
+                    <option value="">Todos os Estados</option>
+                    <option value="open">Abertos</option>
+                    <option value="in_progress">Em Progresso</option>
+                    <option value="waiting_response">Aguardando Resposta</option>
+                    <option value="resolved">Resolvidos</option>
+                    <option value="closed">Fechados</option>
+                </select>
+
+                <select id="ticketPriorityFilter" class="form-control" onchange="filterTickets()">
+                    <option value="">Todas as Prioridades</option>
+                    <option value="low">Baixa</option>
+                    <option value="medium">Média</option>
+                    <option value="high">Alta</option>
+                    <option value="urgent">Urgente</option>
+                </select>
+
+                <select id="ticketCategoryFilter" class="form-control" onchange="filterTickets()">
+                    <option value="">Todas as Categorias</option>
+                    <option value="technical">Técnico</option>
+                    <option value="billing">Faturação</option>
+                    <option value="orders">Pedidos</option>
+                    <option value="account">Conta</option>
+                    <option value="products">Produtos</option>
+                    <option value="shipping">Envios</option>
+                    <option value="returns">Devoluções</option>
+                    <option value="other">Outro</option>
+                </select>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nº Ticket</th>
+                            <th>Cliente</th>
+                            <th>Assunto</th>
+                            <th>Categoria</th>
+                            <th>Prioridade</th>
+                            <th>Estado</th>
+                            <th>Atribuído</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center">A carregar...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Logs Section -->
+        <section id="section-logs" class="content-section">
+            <div class="logs-header">
+                <div class="logs-filters">
+                    <select id="logLevelFilter" class="form-control">
+                        <option value="">Todos os Níveis</option>
+                        <option value="info">Info</option>
+                        <option value="success">Success</option>
+                        <option value="warn">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="debug">Debug</option>
+                    </select>
+                    
+                    <select id="logTypeFilter" class="form-control">
+                        <option value="">Todos os Tipos</option>
+                        <option value="auth">Autenticação</option>
+                        <option value="user">Utilizador</option>
+                        <option value="product">Produto</option>
+                        <option value="order">Pedido</option>
+                        <option value="system">Sistema</option>
+                        <option value="api">API</option>
+                        <option value="security">Segurança</option>
+                    </select>
+                    
+                    <button class="btn btn-primary" onclick="loadLogs()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                    
+                    <button class="btn btn-secondary" onclick="exportLogs()">
+                        <i class="fas fa-download"></i> Exportar CSV
+                    </button>
+                </div>
+                
+                <div class="logs-stats" id="logsStats">
+                    <div class="stat-badge">
+                        <span class="badge badge-info">Total: <strong id="totalLogs">0</strong></span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="badge badge-error">Erros: <strong id="errorLogs">0</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Nível</th>
+                            <th>Tipo</th>
+                            <th>Ação</th>
+                            <th>Mensagem</th>
+                            <th>Utilizador</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center">A carregar logs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="logsPagination"></div>
         </section>
 
         <!-- Settings Section -->

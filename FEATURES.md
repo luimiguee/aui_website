@@ -325,3 +325,7 @@ routes/auth.js           - Rota de verificação de email
 **Desenvolvido com ❤️ para AUI Website**
 *Novembro 2024*
 
+
+
+
+

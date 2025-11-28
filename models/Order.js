@@ -38,15 +38,42 @@ const orderSchema = new mongoose.Schema({
     default: 'pending'
   },
   shippingAddress: {
+    name: String,
+    phone: String,
     street: String,
     city: String,
     postalCode: String,
     country: String
   },
+  shippingMethod: {
+    type: String,
+    enum: ['standard', 'express', 'next-day'],
+    default: 'standard'
+  },
+  shippingCost: {
+    type: Number,
+    default: 0
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['card', 'mbway', 'paypal', 'multibanco', 'transfer'],
+    required: true
+  },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
+  },
+  subtotal: {
+    type: Number,
+    default: 0
+  },
+  discount: {
+    type: Number,
+    default: 0
+  },
+  promoCode: {
+    type: String
   },
   notes: {
     type: String,
@@ -77,4 +104,8 @@ orderSchema.pre('save', async function(next) {
 });
 
 module.exports = mongoose.model('Order', orderSchema);
+
+
+
+
 

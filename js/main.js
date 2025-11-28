@@ -61,6 +61,7 @@ async function loadProducts() {
             console.log('Products loaded:', products.length);
             renderCategories();
             renderProducts();
+            loadCarousel(); // Carregar carousel com produtos em destaque
         } else {
             console.error('No products or not successful');
             showEmptyState();
@@ -641,3 +642,148 @@ window.onclick = function(event) {
         closeProductModal();
     }
 }
+
+// ==================== CAROUSEL ====================
+
+let carouselPosition = 0;
+let carouselProducts = [];
+let carouselInterval;
+
+// Carregar carousel
+async function loadCarousel() {
+    try {
+        // Pegar os primeiros 6 produtos para o carousel
+        const productsToShow = products.slice(0, 6);
+        carouselProducts = productsToShow;
+
+        const track = document.getElementById('carouselTrack');
+        const dotsContainer = document.getElementById('carouselDots');
+
+        if (!track || !dotsContainer) return;
+
+        // Renderizar produtos no carousel
+        track.innerHTML = productsToShow.map(product => `
+            <div class="carousel-item" onclick="showProductModal('${product._id}')">
+                <div class="carousel-item-image">
+                    <img src="${product.imageUrl || 'https://via.placeholder.com/400x300?text=Produto'}" 
+                         alt="${product.name}">
+                    <span class="carousel-item-badge">⭐ Destaque</span>
+                </div>
+                <div class="carousel-item-content">
+                    <div class="carousel-item-category">${product.category}</div>
+                    <h3 class="carousel-item-title">${product.name}</h3>
+                    <p class="carousel-item-description">${product.description}</p>
+                    <div class="carousel-item-footer">
+                        <div class="carousel-item-price">${product.price.toFixed(2)}€</div>
+                        <div class="carousel-item-actions">
+                            <button class="carousel-item-btn" onclick="event.stopPropagation(); toggleFavorite('${product._id}')" title="Favorito">
+                                <i class="${favorites.includes(product._id) ? 'fas' : 'far'} fa-heart"></i>
+                            </button>
+                            <button class="carousel-item-btn" onclick="event.stopPropagation(); addToCart('${product._id}')" title="Adicionar">
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Gerar dots
+        const itemsPerView = getItemsPerView();
+        const dotsCount = Math.ceil(productsToShow.length / itemsPerView);
+        
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < dotsCount; i++) {
+            const dot = document.createElement('div');
+            dot.className = `carousel-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        // Iniciar autoplay
+        startCarouselAutoplay();
+
+    } catch (error) {
+        console.error('Erro ao carregar carousel:', error);
+    }
+}
+
+// Mover carousel
+function moveCarousel(direction) {
+    const track = document.getElementById('carouselTrack');
+    const itemsPerView = getItemsPerView();
+    const maxPosition = Math.ceil(carouselProducts.length / itemsPerView) - 1;
+
+    carouselPosition += direction;
+
+    if (carouselPosition < 0) {
+        carouselPosition = maxPosition;
+    } else if (carouselPosition > maxPosition) {
+        carouselPosition = 0;
+    }
+
+    updateCarouselPosition();
+}
+
+// Ir para slide específico
+function goToSlide(index) {
+    carouselPosition = index;
+    updateCarouselPosition();
+}
+
+// Atualizar posição do carousel
+function updateCarouselPosition() {
+    const track = document.getElementById('carouselTrack');
+    const itemsPerView = getItemsPerView();
+    const itemWidth = 100 / itemsPerView;
+    const offset = -(carouselPosition * 100);
+
+    track.style.transform = `translateX(${offset}%)`;
+
+    // Atualizar dots
+    const dots = document.querySelectorAll('.carousel-dot');
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === carouselPosition);
+    });
+
+    // Reiniciar autoplay
+    stopCarouselAutoplay();
+    startCarouselAutoplay();
+}
+
+// Itens por visualização (responsivo)
+function getItemsPerView() {
+    if (window.innerWidth <= 768) return 1;
+    if (window.innerWidth <= 1024) return 2;
+    return 3;
+}
+
+// Autoplay do carousel
+function startCarouselAutoplay() {
+    stopCarouselAutoplay();
+    carouselInterval = setInterval(() => {
+        moveCarousel(1);
+    }, 5000); // Muda a cada 5 segundos
+}
+
+function stopCarouselAutoplay() {
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+        carouselInterval = null;
+    }
+}
+
+// Parar autoplay ao interagir
+document.addEventListener('DOMContentLoaded', () => {
+    const carouselContainer = document.querySelector('.carousel-container');
+    if (carouselContainer) {
+        carouselContainer.addEventListener('mouseenter', stopCarouselAutoplay);
+        carouselContainer.addEventListener('mouseleave', startCarouselAutoplay);
+    }
+});
+
+// Ajustar carousel ao redimensionar janela
+window.addEventListener('resize', debounce(() => {
+    updateCarouselPosition();
+}, 250));
+

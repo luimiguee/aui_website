@@ -16,6 +16,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/sidebar.css">
 </head>
 <body>
     <!-- Navbar -->
@@ -30,29 +31,6 @@
                 <div class="navbar-search">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Pesquisar produtos..." id="searchInput">
-                </div>
-                
-                <div class="navbar-actions">
-                    <button class="navbar-icon-btn" id="favoritesBtn" title="Favoritos">
-                        <i class="fas fa-heart"></i>
-                        <span class="badge-count" id="favoritesCount">0</span>
-                    </button>
-                    
-                    <button class="navbar-icon-btn" id="cartBtn" title="Carrinho">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="badge-count" id="cartCount">0</span>
-                    </button>
-                    
-                    <div class="navbar-user" id="userMenu">
-                        <button class="navbar-icon-btn" id="userBtn">
-                            <i class="fas fa-user"></i>
-                        </button>
-                        <div class="user-dropdown" id="userDropdown">
-                            <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                            <a href="login.html"><i class="fas fa-sign-in-alt"></i> Entrar</a>
-                            <a href="register.html"><i class="fas fa-user-plus"></i> Registar</a>
-                        </div>
-                    </div>
                 </div>
                 </div>
             </div>
@@ -78,6 +56,34 @@
             <div class="shape shape-1"></div>
             <div class="shape shape-2"></div>
             <div class="shape shape-3"></div>
+        </div>
+    </section>
+
+    <!-- Featured Products Carousel -->
+    <section class="carousel-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Produtos em Destaque</h2>
+                <p>Confira nossos produtos mais populares</p>
+            </div>
+
+            <div class="carousel-container">
+                <button class="carousel-btn carousel-prev" onclick="moveCarousel(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Produtos do carousel serão inseridos aqui -->
+                </div>
+
+                <button class="carousel-btn carousel-next" onclick="moveCarousel(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <div class="carousel-dots" id="carouselDots">
+                    <!-- Dots serão gerados dinamicamente -->
+                </div>
+            </div>
         </div>
     </section>
 
@@ -366,6 +372,7 @@
         </div>
     </div>
 
+    <script src="js/sidebar.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

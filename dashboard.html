@@ -1,98 +1,561 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AUI Website</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/home.css">
-    <style>
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        .dashboard-header {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-        .user-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .user-details h2 {
-            color: var(--text-color);
-            margin-bottom: 8px;
-        }
-        .user-details p {
-            color: var(--text-light);
-        }
-        .logout-btn {
-            padding: 10px 20px;
-            background: var(--error-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        .logout-btn:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
-        }
-    </style>
+    <title>Minha Conta - AUI Store</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/theme-modern.css">
+    <link rel="stylesheet" href="css/dashboard-user.css">
 </head>
-<body>
-    <header class="main-header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="logo">
-                    <a href="index.html">AUI Website</a>
+<body class="user-dashboard-body">
+    <!-- Top Navigation -->
+    <nav class="user-navbar">
+        <div class="container">
+            <div class="user-navbar-content">
+                <a href="index.html" class="navbar-brand">
+                    <i class="fas fa-store"></i>
+                    <span>AUI Store</span>
+                </a>
+                
+                <div class="navbar-actions">
+                    <a href="index.html" class="btn btn-outline btn-sm">
+                        <i class="fas fa-shopping-bag"></i> Voltar à Loja
+                    </a>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
                 </div>
-                <ul class="nav-menu">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="dashboard.html" class="active">Dashboard</a></li>
-                    <li><button class="logout-btn" id="logoutBtn">Sair</button></li>
-                </ul>
+            </div>
             </div>
         </nav>
-    </header>
 
-    <main>
         <div class="dashboard-container">
-            <div class="dashboard-header">
-                <div class="user-info">
-                    <div class="user-details">
-                        <h2 id="userName">Carregando...</h2>
-                        <p id="userEmail">Carregando...</p>
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-large" id="userAvatarLarge">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 id="sidebarUserName">Utilizador</h3>
+                <p id="sidebarUserEmail">user@email.com</p>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="#overview" class="menu-item active" data-section="overview">
+                    <div class="menu-icon">
+                        <i class="fas fa-home"></i>
                     </div>
+                    <div class="menu-text">
+                        <span>Dashboard</span>
+                        <small>Visão geral</small>
+                    </div>
+                </a>
+
+                <a href="#orders" class="menu-item" data-section="orders">
+                    <div class="menu-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Meus Pedidos</span>
+                        <small>Histórico completo</small>
+                    </div>
+                    <span class="menu-badge" id="ordersCount">0</span>
+                </a>
+
+                <a href="#profile" class="menu-item" data-section="profile">
+                    <div class="menu-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Perfil</span>
+                        <small>Dados pessoais</small>
+                    </div>
+                </a>
+
+                <a href="#addresses" class="menu-item" data-section="addresses">
+                    <div class="menu-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Moradas</span>
+                        <small>Endereços de entrega</small>
+                    </div>
+                    <span class="menu-badge" id="addressesCount">0</span>
+                </a>
+
+                <a href="#payments" class="menu-item" data-section="payments">
+                    <div class="menu-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Pagamentos</span>
+                        <small>Métodos de pagamento</small>
+                    </div>
+                    <span class="menu-badge" id="paymentsCount">0</span>
+                </a>
+
+                <a href="#security" class="menu-item" data-section="security">
+                    <div class="menu-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Segurança</span>
+                        <small>Senha e privacidade</small>
+                    </div>
+                </a>
+
+                <a href="#favorites" class="menu-item" data-section="favorites">
+                    <div class="menu-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Favoritos</span>
+                        <small>Produtos guardados</small>
+                    </div>
+                    <span class="menu-badge" id="favoritesCount">0</span>
+                </a>
+
+                <a href="tickets.html" class="menu-item">
+                    <div class="menu-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="menu-text">
+                        <span>Suporte</span>
+                        <small>Criar ticket</small>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Overview Section -->
+            <section class="dashboard-section active" id="section-overview">
+                <div class="section-header">
+                    <div>
+                        <h1>Bem-vindo de volta!</h1>
+                        <p>Gerir a sua conta e acompanhar os seus pedidos</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #10b981;">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalOrders">0</h3>
+                            <p>Total de Pedidos</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #059669;">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalSpent">0,00€</h3>
+                            <p>Total Gasto</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #14b8a6;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="pendingOrders">0</h3>
+                            <p>Pedidos Pendentes</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #0d9488;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="completedOrders">0</h3>
+                            <p>Pedidos Concluídos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-orders">
+                    <h2><i class="fas fa-history"></i> Pedidos Recentes</h2>
+                    <div id="recentOrdersList" class="orders-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>A carregar pedidos...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="dashboard-section" id="section-orders">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-shopping-bag"></i> Meus Pedidos</h1>
+                        <p>Histórico completo de todas as suas compras</p>
+                    </div>
+                </div>
+
+                <div class="orders-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        Todos <span class="filter-count" id="filterAllCount">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="pending">
+                        Pendentes <span class="filter-count" id="filterPendingCount">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="processing">
+                        Em Processamento <span class="filter-count" id="filterProcessingCount">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="shipped">
+                        Enviados <span class="filter-count" id="filterShippedCount">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="delivered">
+                        Entregues <span class="filter-count" id="filterDeliveredCount">0</span>
+                    </button>
+                    <button class="filter-btn" data-filter="cancelled">
+                        Cancelados <span class="filter-count" id="filterCancelledCount">0</span>
+                    </button>
+                </div>
+
+                <div id="allOrdersList" class="orders-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>A carregar pedidos...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Section -->
+            <section class="dashboard-section" id="section-profile">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-user"></i> Perfil</h1>
+                        <p>Gerir os seus dados pessoais</p>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-camera"></i> Alterar Foto
+                        </button>
+                    </div>
+
+                    <form class="profile-form" id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Nome Completo</label>
+                                <input type="text" class="form-input" id="profileName" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" class="form-input" id="profileEmail" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Telefone</label>
+                                <input type="tel" class="form-input" id="profilePhone">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-birthday-cake"></i> Data de Nascimento</label>
+                                <input type="date" class="form-input" id="profileBirthday">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Alterações
+                            </button>
+                            <button type="button" class="btn btn-outline" onclick="cancelProfileEdit()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Addresses Section -->
+            <section class="dashboard-section" id="section-addresses">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-map-marker-alt"></i> Moradas</h1>
+                        <p>Gerir os seus endereços de entrega</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddAddressModal()">
+                        <i class="fas fa-plus"></i> Nova Morada
+                    </button>
+                </div>
+
+                <div id="addressesList" class="addresses-grid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>A carregar moradas...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section class="dashboard-section" id="section-payments">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-credit-card"></i> Métodos de Pagamento</h1>
+                        <p>Gerir os seus métodos de pagamento</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddPaymentModal()">
+                        <i class="fas fa-plus"></i> Adicionar Método
+                    </button>
+                </div>
+
+                <div id="paymentsList" class="payments-grid">
+                    <!-- Payment methods aqui -->
+                </div>
+            </section>
+
+            <!-- Security Section -->
+            <section class="dashboard-section" id="section-security">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-shield-alt"></i> Segurança</h1>
+                        <p>Proteja a sua conta</p>
+                    </div>
+                </div>
+
+                <div class="security-card">
+                    <h3><i class="fas fa-key"></i> Alterar Senha</h3>
+                    <form class="security-form" id="passwordForm">
+                        <div class="form-group">
+                            <label>Senha Atual</label>
+                            <input type="password" class="form-input" id="currentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nova Senha</label>
+                            <input type="password" class="form-input" id="newPassword" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Nova Senha</label>
+                            <input type="password" class="form-input" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Alterar Senha
+                        </button>
+                    </form>
+                </div>
+
+                <div class="security-card">
+                    <h3><i class="fas fa-history"></i> Histórico de Atividades</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <div>
+                                <strong>Login bem-sucedido</strong>
+                                <span>Há 2 horas</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-edit"></i>
+                            <div>
+                                <strong>Perfil atualizado</strong>
+                                <span>Ontem às 15:30</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-shopping-bag"></i>
+                            <div>
+                                <strong>Novo pedido criado</strong>
+                                <span>2 dias atrás</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Favorites Section -->
+            <section class="dashboard-section" id="section-favorites">
+                <div class="section-header">
+                    <div>
+                        <h1><i class="fas fa-heart"></i> Favoritos</h1>
+                        <p>Os seus produtos favoritos</p>
+                    </div>
+                </div>
+
+                <div id="favoritesList" class="favorites-grid">
+                    <!-- Favorites aqui -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Add/Edit Address -->
+    <div class="modal" id="addressModal">
+        <div class="modal-backdrop" onclick="closeAddressModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="addressModalTitle">Nova Morada</h2>
+                <button class="modal-close" onclick="closeAddressModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="addressForm">
+                <input type="hidden" id="addressId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome Completo *</label>
+                        <input type="text" class="form-input" id="addressName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone *</label>
+                        <input type="tel" class="form-input" id="addressPhone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Morada *</label>
+                    <input type="text" class="form-input" id="addressStreet" placeholder="Rua, Número, Andar" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cidade *</label>
+                        <input type="text" class="form-input" id="addressCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Código Postal *</label>
+                        <input type="text" class="form-input" id="addressPostal" placeholder="0000-000" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>País *</label>
+                    <select class="form-input" id="addressCountry" required>
+                        <option value="PT">Portugal</option>
+                        <option value="ES">Espanha</option>
+                        <option value="FR">França</option>
+                        <option value="DE">Alemanha</option>
+                        <option value="UK">Reino Unido</option>
+                    </select>
+                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="addressDefault">
+                    <span>Definir como morada padrão</span>
+                </label>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="closeAddressModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
                 </div>
             </div>
             
-            <div class="features">
-                <h2 class="section-title">Bem-vindo ao Dashboard</h2>
-                <p style="text-align: center; color: var(--text-light); margin-bottom: 40px;">
-                    Você está logado com sucesso! Esta é sua área privada.
-                </p>
+    <!-- Modal: Add Payment Method -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-backdrop" onclick="closePaymentModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Adicionar Método de Pagamento</h2>
+                <button class="modal-close" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="paymentForm">
+                <div class="form-group">
+                    <label>Tipo de Método</label>
+                    <select class="form-input" id="paymentType" required>
+                        <option value="">Selecione...</option>
+                        <option value="card">Cartão de Crédito/Débito</option>
+                        <option value="mbway">MB WAY</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+
+                <div id="cardFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Número do Cartão *</label>
+                        <input type="text" class="form-input" id="cardNumber" maxlength="19" placeholder="0000 0000 0000 0000">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Validade *</label>
+                            <input type="text" class="form-input" id="cardExpiry" maxlength="5" placeholder="MM/AA">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV *</label>
+                            <input type="text" class="form-input" id="cardCVV" maxlength="4" placeholder="000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome no Cartão *</label>
+                        <input type="text" class="form-input" id="cardName" placeholder="NOME COMO APARECE NO CARTÃO">
+                    </div>
+                </div>
+
+                <div id="mbwayFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Número de Telemóvel *</label>
+                        <input type="tel" class="form-input" id="mbwayPhone" placeholder="+351 900 000 000">
+                    </div>
+                </div>
+
+                <div id="paypalFields" style="display: none;">
+                    <div class="form-group">
+                        <label>Email do PayPal *</label>
+                        <input type="email" class="form-input" id="paypalEmail" placeholder="seu@email.com">
+                    </div>
+                </div>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="paymentDefault">
+                    <span>Definir como método padrão</span>
+                </label>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Adicionar
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="closePaymentModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Order Details -->
+    <div class="modal" id="orderDetailsModal">
+        <div class="modal-backdrop" onclick="closeOrderDetailsModal()"></div>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido</h2>
+                <button class="modal-close" onclick="closeOrderDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Order details aqui -->
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer class="main-footer">
-        <div class="container">
-            <p>&copy; 2024 AUI Website. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <script src="js/dashboard.js"></script>
+    <script src="js/dashboard-user.js"></script>
 </body>
 </html>
-
-

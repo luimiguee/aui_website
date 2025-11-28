@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestão de Tickets | AUI Store</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: #667eea;
+        }
+
+        .tickets-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        /* Lista de Tickets */
+        .tickets-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+        }
+
+        .ticket-item {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ticket-item:hover {
+            background: #f7fafc;
+        }
+
+        .ticket-item.active {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .ticket-number {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .ticket-status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .ticket-status.open { background: #bee3f8; color: #2c5282; }
+        .ticket-status.in_progress { background: #fefcbf; color: #744210; }
+        .ticket-status.resolved { background: #c6f6d5; color: #22543d; }
+        .ticket-status.closed { background: #e2e8f0; color: #4a5568; }
+
+        .ticket-subject {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .ticket-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* Detalhes do Ticket */
+        .ticket-details {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-height: calc(100vh - 180px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ticket-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 60px;
+            text-align: center;
+            color: #a0aec0;
+        }
+
+        .ticket-empty i {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .detail-header {
+            padding: 25px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .detail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Messages */
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .message-sender {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .message-role {
+            padding: 2px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-left: auto;
+        }
+
+        .message-text {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 12px;
+            color: #2d3748;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .message.admin .message-avatar {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .message.admin .message-text {
+            background: #edf2f7;
+        }
+
+        /* Reply Form */
+        .reply-form {
+            padding: 20px 25px;
+            border-top: 2px solid #e2e8f0;
+            background: #f7fafc;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .reply-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .reply-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .status-select {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .tickets-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .tickets-list {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-ticket-alt"></i>
+                Gestão de Tickets de Suporte
+            </h1>
+        </div>
+
+        <div class="tickets-layout">
+            <!-- Lista de Tickets -->
+            <div class="tickets-list" id="ticketsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- Detalhes do Ticket -->
+            <div class="ticket-details" id="ticketDetails">
+                <div class="ticket-empty">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Selecione um ticket</h3>
+                    <p>Escolha um ticket da lista para ver os detalhes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdminTicketsManager {
+            constructor() {
+                this.token = localStorage.getItem('token');
+                this.selectedTicketId = null;
+                this.init();
+            }
+
+            async init() {
+                if (!this.token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                await this.loadTickets();
+            }
+
+            async loadTickets() {
+                try {
+                    const response = await fetch('/api/tickets/my-tickets', {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.renderTickets(data.tickets);
+                    } else {
+                        throw new Error('Erro ao carregar tickets');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    document.getElementById('ticketsList').innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #e53e3e;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 10px;"></i>
+                            <p>Erro ao carregar tickets</p>
+                        </div>
+                    `;
+                }
+            }
+
+            renderTickets(tickets) {
+                const listEl = document.getElementById('ticketsList');
+                
+                if (tickets.length === 0) {
+                    listEl.innerHTML = `
+                        <div style="padding: 40px; text-align: center; color: #a0aec0;">
+                            <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>Nenhum ticket encontrado</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = tickets.map(ticket => `
+                    <div class="ticket-item" data-id="${ticket._id}">
+                        <div class="ticket-header">
+                            <span class="ticket-number">${ticket.ticketNumber}</span>
+                            <span class="ticket-status ${ticket.status}">${this.getStatusLabel(ticket.status)}</span>
+                        </div>
+                        <div class="ticket-subject">${ticket.subject}</div>
+                        <div class="ticket-meta">
+                            <span><i class="fas fa-user"></i> ${ticket.user?.name || 'Desconhecido'}</span>
+                            <span><i class="fas fa-clock"></i> ${this.formatDate(ticket.createdAt)}</span>
+                            ${ticket.messages?.length > 0 ? `<span><i class="fas fa-comments"></i> ${ticket.messages.length}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Event listeners
+                document.querySelectorAll('.ticket-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.selectTicket(item.dataset.id);
+                    });
+                });
+            }
+
+            async selectTicket(ticketId) {
+                this.selectedTicketId = ticketId;
+
+                // Update UI
+                document.querySelectorAll('.ticket-item').forEach(item => {
+                    item.classList.toggle('active', item.dataset.id === ticketId);
+                });
+
+                await this.loadTicketDetails(ticketId);
+            }
+
+            async loadTicketDetails(ticketId) {
+                const detailsEl = document.getElementById('ticketDetails');
+                detailsEl.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+                try {
+                    const response = await fetch(`/api/tickets/${ticketId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.renderTicketDetails(data);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                }
+            }
+
+            renderTicketDetails(ticket) {
+                const detailsEl = document.getElementById('ticketDetails');
+                
+                detailsEl.innerHTML = `
+                    <div class="detail-header">
+                        <div class="detail-title">${ticket.subject}</div>
+                        <div class="detail-meta">
+                            <div class="detail-meta-item">
+                                <i class="fas fa-hashtag"></i>
+                                <span>${ticket.ticketNumber}</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>${ticket.user?.name || 'Desconhecido'}</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>${this.formatDate(ticket.createdAt)}</span>
+                            </div>
+                            <div class="detail-meta-item">
+                                <i class="fas fa-tag"></i>
+                                <span>${this.getCategoryLabel(ticket.category)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="messages-container" id="messagesContainer">
+                        <!-- Mensagem inicial -->
+                        <div class="message">
+                            <div class="message-avatar">${this.getInitials(ticket.user?.name)}</div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${ticket.user?.name || 'Desconhecido'}</span>
+                                    <span class="message-time">${this.formatDateTime(ticket.createdAt)}</span>
+                                </div>
+                                <div class="message-text">${ticket.description}</div>
+                            </div>
+                        </div>
+
+                        ${ticket.messages?.map(msg => `
+                            <div class="message ${msg.senderType}">
+                                <div class="message-avatar">${this.getInitials(msg.sender?.name)}</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">${msg.sender?.name || 'Admin'}</span>
+                                        <span class="message-role">${msg.senderType === 'admin' ? 'Admin' : 'Cliente'}</span>
+                                        <span class="message-time">${this.formatDateTime(msg.createdAt)}</span>
+                                    </div>
+                                    <div class="message-text">${msg.message}</div>
+                                </div>
+                            </div>
+                        `).join('') || ''}
+                    </div>
+
+                    <div class="reply-form">
+                        <textarea 
+                            class="reply-textarea" 
+                            id="replyMessage" 
+                            placeholder="Digite sua resposta..."
+                        ></textarea>
+                        <div class="reply-actions">
+                            <button class="btn btn-primary" id="sendReply">
+                                <i class="fas fa-paper-plane"></i>
+                                Enviar Resposta
+                            </button>
+                            <button class="btn btn-secondary" id="closeTicket">
+                                <i class="fas fa-check"></i>
+                                Resolver
+                            </button>
+                            <select class="status-select" id="statusSelect">
+                                <option value="open" ${ticket.status === 'open' ? 'selected' : ''}>Aberto</option>
+                                <option value="in_progress" ${ticket.status === 'in_progress' ? 'selected' : ''}>Em Progresso</option>
+                                <option value="resolved" ${ticket.status === 'resolved' ? 'selected' : ''}>Resolvido</option>
+                                <option value="closed" ${ticket.status === 'closed' ? 'selected' : ''}>Fechado</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+
+                // Event listeners
+                document.getElementById('sendReply')?.addEventListener('click', () => this.sendReply());
+                document.getElementById('closeTicket')?.addEventListener('click', () => this.resolveTicket());
+                document.getElementById('statusSelect')?.addEventListener('change', (e) => this.updateStatus(e.target.value));
+
+                // Scroll to bottom
+                setTimeout(() => {
+                    const container = document.getElementById('messagesContainer');
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            }
+
+            async sendReply() {
+                const messageEl = document.getElementById('replyMessage');
+                const message = messageEl.value.trim();
+
+                if (!message) {
+                    alert('Por favor, digite uma mensagem');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/tickets/${this.selectedTicketId}/reply`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    });
+
+                    if (response.ok) {
+                        messageEl.value = '';
+                        await this.loadTicketDetails(this.selectedTicketId);
+                        await this.loadTickets();
+                    } else {
+                        alert('Erro ao enviar resposta');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro ao enviar resposta');
+                }
+            }
+
+            async updateStatus(newStatus) {
+                try {
+                    const response = await fetch(`/api/tickets/${this.selectedTicketId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${this.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (response.ok) {
+                        await this.loadTickets();
+                        await this.loadTicketDetails(this.selectedTicketId);
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                }
+            }
+
+            async resolveTicket() {
+                if (confirm('Deseja marcar este ticket como resolvido?')) {
+                    await this.updateStatus('resolved');
+                }
+            }
+
+            getStatusLabel(status) {
+                const labels = {
+                    'open': 'Aberto',
+                    'in_progress': 'Em Progresso',
+                    'resolved': 'Resolvido',
+                    'closed': 'Fechado'
+                };
+                return labels[status] || status;
+            }
+
+            getCategoryLabel(category) {
+                const labels = {
+                    'technical': 'Técnico',
+                    'billing': 'Faturação',
+                    'orders': 'Pedidos',
+                    'account': 'Conta',
+                    'products': 'Produtos',
+                    'shipping': 'Envios',
+                    'returns': 'Devoluções',
+                    'other': 'Outro'
+                };
+                return labels[category] || category;
+            }
+
+            getInitials(name) {
+                if (!name) return '?';
+                return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            }
+
+            formatDate(date) {
+                return new Date(date).toLocaleDateString('pt-PT', {
+                    day: '2-digit',
+                    month: 'short'
+                });
+            }
+
+            formatDateTime(date) {
+                return new Date(date).toLocaleDateString('pt-PT', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // Inicializar
+        new AdminTicketsManager();
+    </script>
+</body>
+</html>
+

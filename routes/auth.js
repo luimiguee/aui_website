@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 
 // Gerar token JWT
 const generateToken = (userId) => {
@@ -118,6 +119,16 @@ router.post('/login', async (req, res) => {
 
     // Gerar token
     const token = generateToken(user._id);
+
+    // Log de login
+    await logger.logAuth(
+      'login',
+      `Utilizador fez login: ${user.email}`,
+      user._id,
+      user.name,
+      user.email,
+      req.ip
+    );
 
     res.json({
       success: true,
