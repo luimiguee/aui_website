@@ -448,5 +448,5 @@ A: Integre Stripe/PayPal nas rotas de checkout.
 
 ---
 
-*Última atualização: Novembro 2024*
+*Última atualização: Novembro 2025*
 *Versão: 1.0.0*
